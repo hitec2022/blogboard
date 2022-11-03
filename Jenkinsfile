@@ -26,7 +26,7 @@
          }
          stage('Deployment') {
              steps {
-                 sh 'docker run -p 8081:8080 --name blogboard blogboard:0.0.1'
+                 sh 'docker run -d --name blogboard blogboard:0.0.1'
              }
          }
      }
