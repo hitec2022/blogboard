@@ -3,19 +3,30 @@
      stages {
          stage('BUILD') {
              steps {
-                 sh 'npm run build'
+                 sh 'mvn package -DskipTests'
              }
          }
-
          stage('STOP App') {
              steps {
-                 sh 'ssh root@nginx "rm -rf /root/nginx/front"'
+                 script {
+                     try {
+                         sh 'docker stop blogboard'
+                         sh 'docker rm blogboard' 
+                     } catch (err) {
+                         echo err.getMessage()
+                         echo 'Stop App Failed'
+                     }
+                 }
              }
          }
-         
+         stage('Dockernizer') {
+             steps {
+                 sh 'docker build --build-arg APP_FILE=target/board*.jar -t blogboard:0.0.1 .'
+             }
+         }
          stage('Deployment') {
              steps {
-                 sh 'scp -r ./build root@nginx:/root/nginx/front'
+                 sh 'docker run -p 8081:8080 --name blogboard blogboard:0.0.1'
              }
          }
      }
