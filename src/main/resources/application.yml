@@ -1,0 +1,16 @@
+server:
+  port: 8899
+spring:
+  datasource:
+    url: jdbc:postgresql://192.168.56.1:5432/hitecboard
+    username: hitec
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+        
+logging.level:
+  org.hibernate.SQL: debug
