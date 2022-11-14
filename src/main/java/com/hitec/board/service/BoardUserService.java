@@ -20,8 +20,12 @@ public class BoardUserService {
         return userRepository.save(user);
     }
 
-    public BoardUser getUser(Long id){
+    public BoardUser getUser(String id){
         return userRepository.findById(id).orElseThrow();
+    }
+
+    public boolean userExist(String id){
+        return userRepository.existsById(id);
     }
 
     public BoardUser getUserByName(String userName){

@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BoardUserRepository extends JpaRepository<BoardUser, Long>{
+public interface BoardUserRepository extends JpaRepository<BoardUser, String>{
     public BoardUser findBoardUserByUsername(String userName);
 }

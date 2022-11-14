@@ -21,9 +21,18 @@ import lombok.Setter;
 public class BoardUser{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    //@GeneratedValue(strategy = GenerationType.AUTO)
+    private String id;
 
     @Column(name = "username")
     private String username;
+
+    @Column(name = "name")
+    String name;
+
+    @Column(name = "preferred_username")
+    String preferred_username;
+
+    @Column(name = "email")
+    String email;
 }

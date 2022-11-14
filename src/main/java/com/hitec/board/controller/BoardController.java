@@ -5,10 +5,12 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.hitec.board.argument.AuthUser;
 import com.hitec.board.model.Board;
 import com.hitec.board.model.BoardUser;
 import com.hitec.board.service.BoardService;
 import com.hitec.board.service.BoardUserService;
+import com.hitec.board.vo.AuthUserVo;
 import com.hitec.board.vo.BoardVo;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,16 +56,22 @@ public class BoardController {
 
     @PostMapping("/board")
     @Transactional
-    public BoardVo setBoard(@RequestBody BoardVo boardVo){
-        //TODO username이 null이면 저장하지 않게  
-        //TODO username이 중복이 있는지 확인 
-        BoardUser boardUser = boardUserService.setUser(new BoardUser(null, boardVo.getUserName()));
+    public BoardVo setBoard(@AuthUser AuthUserVo authUser, @RequestBody BoardVo boardVo){
+
+        BoardUser boardUser = null;
+        if(boardUserService.userExist(authUser.getId())){
+            boardUser = boardUserService.getUser(authUser.getId());
+        }else{
+            boardUser = new BoardUser(authUser.getId(), authUser.getUsername(), authUser.getName(), authUser.getPreferred_username(), authUser.getEmail());
+            boardUser = boardUserService.setUser(boardUser);
+        }
+
         Board board = boardService.setBoard(new Board(null, boardVo.getTitle(), boardVo.getContent(), boardUser));
         return new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser().getUsername());
     }
 
     @PutMapping("/board")
-    public BoardVo modifyBoard(@RequestBody BoardVo boardVo){
+    public BoardVo modifyBoard(@AuthUser AuthUserVo authUser, @RequestBody BoardVo boardVo){
         Board board = boardService.setBoard(new Board(boardVo.getId(), boardVo.getTitle(), boardVo.getContent(), boardUserService.getUserByName(boardVo.getUserName())));
         return new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser().getUsername());
     }
