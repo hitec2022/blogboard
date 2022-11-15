@@ -42,7 +42,7 @@ public class BoardController {
 
         List<BoardVo> rtnList = new ArrayList<>();
         for(Board board : boardList){
-            rtnList.add(new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser().getUsername()));
+            rtnList.add(new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser()!=null?board.getBoardUser().getUsername():null));
         }
 
         return rtnList;
@@ -51,7 +51,7 @@ public class BoardController {
     @GetMapping("/board/{boardId}")
     public BoardVo getBoard(@PathVariable Long boardId){
         Board board = boardService.getBoard(boardId);
-        return new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser().getUsername());
+        return new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser()!=null?board.getBoardUser().getUsername():null);
     }
 
     @PostMapping("/board")
@@ -67,13 +67,26 @@ public class BoardController {
         }
 
         Board board = boardService.setBoard(new Board(null, boardVo.getTitle(), boardVo.getContent(), boardUser));
-        return new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser().getUsername());
+        return new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser()!=null?board.getBoardUser().getUsername():null);
     }
 
     @PutMapping("/board")
     public BoardVo modifyBoard(@AuthUser AuthUserVo authUser, @RequestBody BoardVo boardVo){
-        Board board = boardService.setBoard(new Board(boardVo.getId(), boardVo.getTitle(), boardVo.getContent(), boardUserService.getUserByName(boardVo.getUserName())));
-        return new BoardVo(board.getId(), board.getTitle(), board.getContent(), board.getBoardUser().getUsername());
+        BoardUser boardUser = null;
+        if(boardUserService.userExist(authUser.getId())){
+            boardUser = boardUserService.getUser(authUser.getId());
+        }else{
+            boardUser = new BoardUser(authUser.getId(), authUser.getUsername(), authUser.getName(), authUser.getPreferred_username(), authUser.getEmail());
+            boardUser = boardUserService.setUser(boardUser);
+        }
+
+        Board board = boardService.getBoard(boardVo.getId());
+        board.setBoardUser(boardUser);
+        board.setTitle(boardVo.getTitle());
+        board.setContent(boardVo.getContent());
+
+        Board boardRtn = boardService.setBoard(board);
+        return new BoardVo(boardRtn.getId(), boardRtn.getTitle(), boardRtn.getContent(), boardRtn.getBoardUser()!=null?boardRtn.getBoardUser().getUsername():null);
     }
     
 }
